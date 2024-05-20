@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Models\Post;
+use Illuminate\Support\Facades\Storage;
 
 /**
  * Class PostsService.
@@ -68,17 +69,42 @@ class PostsService
         $post->status = $postData['status'] ?? $post->status;
         $post->content = $postData['content'] ?? $post->content;
 
+        if (isset($postData['image'])) {
+            $this->updateImage($post, $postData['image']);
+        }
+
         $post->save();
 
         return $post;
+    }
+
+    private function updateImage(Post $posts, $image)
+    {
+        $imageName = time() . '.' . $image->getClientOriginalExtension();
+        $imagePath = $image->storeAs('public/images/posts', $imageName);
+
+        if ($posts->image) {
+            Storage::delete('public/' . $posts->image);
+        }
+
+        $posts->image = str_replace('public/', '', $imagePath);
     }
 
     public function deletePost(string $postId)
     {
         $post = Post::findOrFail($postId);
 
+        $this->deleteImage($post->image);
+
         $post->delete();
 
         return $post;
+    }
+
+    private function deleteImage($imagePath)
+    {
+        if ($imagePath) {
+            Storage::delete('public/' . $imagePath);
+        }
     }
 }
