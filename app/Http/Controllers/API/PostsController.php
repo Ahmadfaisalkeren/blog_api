@@ -50,6 +50,17 @@ class PostsController extends Controller
         ], 200);
     }
 
+    public function show($slug)
+    {
+        $post = $this->postsService->getPostBySlug($slug);
+
+        return response()->json([
+            'status' => 200,
+            'message' => 'Post Fetched Successfully',
+            'post' => $post,
+        ], 200);
+    }
+
     public function edit(string $postId)
     {
         $post = $this->postsService->getPostById($postId);

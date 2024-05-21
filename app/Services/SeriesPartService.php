@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Models\Series;
 use App\Models\SeriesPart;
 
 /**
@@ -9,9 +10,11 @@ use App\Models\SeriesPart;
  */
 class SeriesPartService
 {
-    public function getSeriesPart(string $seriesId)
+    public function getSeriesPartBySlug(string $seriesSlug)
     {
-        $seriesPart = SeriesPart::with('series')->where('series_id', $seriesId)->orderBy('created_at', 'ASC')->get();
+        $series = Series::where('slug', $seriesSlug)->firstOrFail();
+
+        $seriesPart = SeriesPart::with('series')->where('series_id', $series->id)->orderBy('created_at', 'ASC')->get();
 
         return $seriesPart;
     }

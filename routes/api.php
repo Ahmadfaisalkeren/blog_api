@@ -39,7 +39,8 @@ Route::middleware('auth:sanctum')->group(function () {
 Route::get('posts', [PostsController::class, 'index']);
 Route::get('publishedPosts', [PostsController::class, 'publishedPosts']);
 Route::get('post/{postId}', [PostsController::class, 'edit']);
+Route::get('post/{slug}/show', [PostsController::class, 'show']);
 Route::get('heroes', [HeroController::class, 'index']);
 Route::get('series', [SeriesController::class, 'index']);
 Route::get('publishedSeries', [SeriesController::class, 'publishedSeries']);
-Route::get('seriesPart/{seriesId}', [SeriesPartController::class, 'index']);
+Route::get('seriesPart/{seriesSlug}', [SeriesPartController::class, 'index']);

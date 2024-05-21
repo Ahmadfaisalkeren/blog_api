@@ -17,9 +17,9 @@ class SeriesPartController extends Controller
         $this->seriesPartService = $seriesPartService;
     }
 
-    public function index(string $seriesId)
+    public function index(string $seriesSlug)
     {
-        $seriesPart = $this->seriesPartService->getSeriesPart($seriesId);
+        $seriesPart = $this->seriesPartService->getSeriesPartBySlug($seriesSlug);
 
         return response()->json([
             'status' => 200,

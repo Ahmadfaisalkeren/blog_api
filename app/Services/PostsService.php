@@ -51,6 +51,13 @@ class PostsService
         return $imagePath;
     }
 
+    public function getPostBySlug($slug)
+    {
+        $post = Post::where('slug', $slug)->firstOrFail();
+
+        return $post;
+    }
+
     public function getPostById(string $postId)
     {
         $post = Post::findOrFail($postId);
