@@ -42,5 +42,6 @@ Route::get('post/{postId}', [PostsController::class, 'edit']);
 Route::get('post/{slug}/show', [PostsController::class, 'show']);
 Route::get('heroes', [HeroController::class, 'index']);
 Route::get('series', [SeriesController::class, 'index']);
+Route::get('series/{slug}/show', [SeriesController::class, 'show']);
 Route::get('publishedSeries', [SeriesController::class, 'publishedSeries']);
 Route::get('seriesPart/{seriesSlug}', [SeriesPartController::class, 'index']);

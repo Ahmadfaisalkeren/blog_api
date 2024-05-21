@@ -7,6 +7,7 @@ use App\Services\SeriesService;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Series\StoreSeriesRequest;
 use App\Http\Requests\Series\UpdateSeriesRequest;
+use PhpParser\Node\Expr\FuncCall;
 
 class SeriesController extends Controller
 {
@@ -46,6 +47,17 @@ class SeriesController extends Controller
         return response()->json([
             'status' => 200,
             'message' => 'Series Stored Successfully',
+            'series' => $series,
+        ], 200);
+    }
+
+    public function show($slug)
+    {
+        $series = $this->seriesService->getSeriesBySlug($slug);
+
+        return response()->json([
+            'status' => 200,
+            'message' => 'Series Fetched Successfully',
             'series' => $series,
         ], 200);
     }

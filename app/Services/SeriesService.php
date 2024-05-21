@@ -43,6 +43,13 @@ class SeriesService
         return $imagePath;
     }
 
+    public function getSeriesBySlug($slug)
+    {
+        $series = Series::where('slug', $slug)->firstOrFail();
+
+        return $series;
+    }
+
     public function getSeriesById(string $seriesId)
     {
         $series = Series::findOrFail($seriesId);
