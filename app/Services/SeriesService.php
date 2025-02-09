@@ -3,6 +3,8 @@
 namespace App\Services;
 
 use App\Models\Series;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 
 /**
@@ -88,21 +90,26 @@ class SeriesService
         $series->image = str_replace('public/', '', $imagePath);
     }
 
-    public function deleteSeries(string $seriesId)
+    public function deleteSeries($id)
     {
-        $series = Series::findOrFail($seriesId);
+        $series = Series::findOrFail($id);
 
-        $this->deleteImage($series->image);
+        DB::beginTransaction();
 
-        $series->delete();
+        try {
+            foreach ($series->seriesParts as $seriesPart) {
+                app(SeriesPartService::class)->deleteSeriesPart($seriesPart->id);
+            }
 
-        return $series;
-    }
+            $series->delete();
 
-    private function deleteImage($imagePath)
-    {
-        if ($imagePath) {
-            Storage::delete('public/' . $imagePath);
+            DB::commit();
+
+            return true;
+        } catch (\Exception $e) {
+            DB::rollBack();
+            Log::error($e->getMessage());
+            return false;
         }
     }
 }

@@ -9,7 +9,7 @@ use Laravel\Sanctum\HasApiTokens;
 
 class Hero extends Model
 {
-    use HasFactory, HasApiTokens, HasUuids;
+    use HasFactory, HasApiTokens;
 
     protected $table = 'heroes';
     protected $fillable = [

@@ -3,115 +3,101 @@
 namespace App\Services;
 
 use App\Models\Post;
-use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\DB;
+use App\Services\ContentBlocksService;
 
-/**
- * Class PostsService.
- */
 class PostsService
 {
+    protected $contentBlocksService;
+
+    public function __construct(ContentBlocksService $contentBlocksService)
+    {
+        $this->contentBlocksService = $contentBlocksService;
+    }
+
     public function getPosts()
     {
-        $posts = Post::all();
-
-        return $posts;
+        return Post::with('contentBlocks')->orderBy('created_at', 'desc')->get();
     }
 
     public function publishedPosts()
     {
-        $posts = Post::where('status', '=', 'publish')->orderBy('created_at', 'desc')->get();
-
-        return $posts;
-    }
-
-    public function upload($image)
-    {
-        $imageName = time() . '.' . $image->getClientOriginalExtension();
-        $imagePath = $image->storeAs('images/posts/postDetail', $imageName, 'public');
-
-        return $imagePath;
+        return Post::with('contentBlocks')->where('status', 'publish')->orderBy('created_at', 'desc')->get();
     }
 
     public function storePost(array $postData)
     {
-        if (isset($postData['image'])) {
-            $postData['image'] = $this->storeImage($postData['image']);
+        DB::beginTransaction();
+
+        try {
+            $postId = $postData['id'] ?? null;
+            $post = $postId ? Post::findOrFail($postId) : new Post();
+
+            $post->fill([
+                'title' => $postData['title'] ?? $post->title,
+                'slug' => $postData['slug'] ?? $post->slug,
+                'author' => $postData['author'] ?? $post->author,
+                'post_date' => $postData['post_date'] ?? $post->post_date,
+                'status' => $postData['status'] ?? $post->status,
+            ]);
+            $post->save();
+
+            if (isset($postData['content_blocks'])) {
+                $this->contentBlocksService->updateContentBlocks($post, $postData['content_blocks']);
+            }
+
+            DB::commit();
+            return $post->load('contentBlocks');
+        } catch (\Exception $e) {
+            DB::rollBack();
+            throw $e;
         }
+    }
 
-        $post = Post::create($postData);
+    public function getPostById($id)
+    {
+        $post = Post::with([
+            'contentBlocks' => function ($query) {
+                $query->where('parent_type', Post::class)
+                    ->orderBy('order', 'asc');
+            },
+            'contentBlocks.paragraphs',
+            'contentBlocks.headers',
+            'contentBlocks.listItems',
+            'contentBlocks.codes',
+            'contentBlocks.images'
+        ])->find($id);
 
         return $post;
     }
 
-    private function storeImage($image)
+    public function storeTemporaryImage($image)
     {
-        $imageName = time() . '.' . $image->getClientOriginalExtension();
-        $imagePath = $image->storeAs('images/posts', $imageName, 'public');
-
-        return $imagePath;
+        return $this->contentBlocksService->storeTemporaryImage($image);
     }
 
-    public function getPostBySlug($slug)
+    public function deleteImageBlock($type, $id)
     {
-        $post = Post::where('slug', $slug)->firstOrFail();
-
-        return $post;
+        return $this->contentBlocksService->deleteImageBlock($type, $id);
     }
 
-    public function getPostById(string $postId)
+    public function deletePost($postId)
     {
-        $post = Post::findOrFail($postId);
+        DB::beginTransaction();
 
-        return $post;
-    }
+        try {
+            $post = Post::find($postId);
+            if (!$post) throw new \Exception('Post not found.');
 
-    public function updatePost(string $postId, array $postData)
-    {
-        $post = Post::findOrFail($postId);
+            $this->contentBlocksService->updateContentBlocks($post, []);
 
-        $post->title = $postData['title'] ?? $post->title;
-        $post->slug = $postData['slug'] ?? $post->slug;
-        $post->author = $postData['author'] ?? $post->author;
-        $post->post_date = $postData['post_date'] ?? $post->post_date;
-        $post->status = $postData['status'] ?? $post->status;
-        $post->content = $postData['content'] ?? $post->content;
+            $post->delete();
+            DB::commit();
 
-        if (isset($postData['image'])) {
-            $this->updateImage($post, $postData['image']);
-        }
-
-        $post->save();
-
-        return $post;
-    }
-
-    private function updateImage(Post $posts, $image)
-    {
-        $imageName = time() . '.' . $image->getClientOriginalExtension();
-        $imagePath = $image->storeAs('public/images/posts', $imageName);
-
-        if ($posts->image) {
-            Storage::delete('public/' . $posts->image);
-        }
-
-        $posts->image = str_replace('public/', '', $imagePath);
-    }
-
-    public function deletePost(string $postId)
-    {
-        $post = Post::findOrFail($postId);
-
-        $this->deleteImage($post->image);
-
-        $post->delete();
-
-        return $post;
-    }
-
-    private function deleteImage($imagePath)
-    {
-        if ($imagePath) {
-            Storage::delete('public/' . $imagePath);
+            return response()->json(['success' => true, 'message' => 'Post deleted successfully']);
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return response()->json(['success' => false, 'message' => $e->getMessage()], 500);
         }
     }
 }

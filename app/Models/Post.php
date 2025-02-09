@@ -2,14 +2,15 @@
 
 namespace App\Models;
 
+use Laravel\Sanctum\HasApiTokens;
+use App\Models\Editor\ContentBlocks;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Model;
-use Laravel\Sanctum\HasApiTokens;
 
 class Post extends Model
 {
-    use HasFactory, HasApiTokens, HasUuids;
+    use HasFactory, HasApiTokens;
 
     protected $table = 'posts';
     protected $fillable = [
@@ -18,7 +19,11 @@ class Post extends Model
         'author',
         'post_date',
         'status',
-        'content',
-        'image',
     ];
+
+    public function contentBlocks()
+    {
+        return $this->hasMany(ContentBlocks::class, 'parent_id')
+            ->where('parent_type', Post::class);
+    }
 }

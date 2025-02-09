@@ -11,13 +11,13 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('posts', function (Blueprint $table) {
+        Schema::create('list_items', function (Blueprint $table) {
             $table->id();
-            $table->string('title');
-            $table->string('slug');
-            $table->string('author');
-            $table->date('post_date');
-            $table->enum('status', ['publish', 'hide'])->default('hide');
+            $table->foreignId('content_block_id')->constrained('content_blocks')->onDelete('cascade');
+            $table->integer('order');
+            $table->string('list');
+            $table->string('style');
+            $table->json('meta')->nullable();
             $table->timestamps();
         });
     }
@@ -27,6 +27,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('posts');
+        Schema::dropIfExists('list_items');
     }
 };

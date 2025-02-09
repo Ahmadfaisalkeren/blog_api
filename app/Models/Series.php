@@ -9,7 +9,7 @@ use Laravel\Sanctum\HasApiTokens;
 
 class Series extends Model
 {
-    use HasFactory, HasApiTokens, HasUuids;
+    use HasFactory, HasApiTokens;
 
     protected $table = 'series';
     protected $fillable = [
@@ -18,7 +18,6 @@ class Series extends Model
         'author',
         'series_date',
         'status',
-        'image',
     ];
 
     public function seriesParts()

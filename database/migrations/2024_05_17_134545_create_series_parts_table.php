@@ -12,11 +12,10 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('series_parts', function (Blueprint $table) {
-            $table->uuid('id')->primary();
-            $table->foreignUuid('series_id')->constrained()->onDelete('cascade');
+            $table->id();
+            $table->foreignId('series_id')->constrained()->onDelete('cascade');
             $table->integer('part_number');
             $table->string('title');
-            $table->longText('content');
             $table->timestamps();
         });
     }

@@ -4,37 +4,43 @@ namespace App\Http\Controllers\API\Auth;
 
 use App\Models\User;
 use Illuminate\Http\Request;
+use App\Services\AuthService;
 use Illuminate\Support\Facades\Log;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Hash;
+use App\Http\Requests\Auth\LoginRequest;
 
 class LoginController extends Controller
 {
-    public function login(Request $request)
+    protected $authService;
+
+    public function __construct(AuthService $authService)
     {
-        $request->validate([
-            'email' => 'required|email',
-            'password' => 'required',
-        ]);
+        $this->authService = $authService;
+    }
 
-        $email = $request->email;
-        $password = $request->password;
+    public function login(LoginRequest $request)
+    {
+        $credentials = $request->only('email', 'password');
+        $result = $this->authService->login($credentials);
 
-        $user = User::where('email', $email)->first();
-
-        if (!$user || !Hash::check($request->password, $user->password)) {
-            Log::error('Unauthorized login attempt for email: ' . $request->email);
-            return response()->json(['error' => 'Unauthorized'], 401);
+        if ($result['status'] === 'error') {
+            return response()->json([
+                'error' => $result['message']
+            ], 401);
         }
 
-        $token = $user->createToken('token-name')->plainTextToken;
+        return response()->json($result, 200);
+    }
 
-        $user->tokens->last()->update(['expires_at' => now()->addMinutes(1440)]);
+    public function user($id)
+    {
+        $user = $this->authService->getUser($id);
 
         return response()->json([
-            'access_token' => $token,
-            'token_type' => 'bearer',
-            'expires_in' => 1440,
+            'status' => 200,
+            'message' => 'User Fetched Successfully',
+            'user' => $user,
         ]);
     }
 }

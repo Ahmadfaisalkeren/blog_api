@@ -11,8 +11,11 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('posts', function (Blueprint $table) {
-            $table->string('image')->after('content');
+        Schema::create('paragraphs', function (Blueprint $table) {
+            $table->id();
+            $table->foreignId('content_block_id')->nullable()->constrained('content_blocks')->onDelete('cascade');
+            $table->longText('paragraph');
+            $table->timestamps();
         });
     }
 
@@ -21,10 +24,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('posts', function (Blueprint $table) {
-            if (Schema::hasColumn('posts', 'image')) {
-                $table->dropColumn('image');
-            }
-        });
+        Schema::dropIfExists('paragraphs');
     }
 };

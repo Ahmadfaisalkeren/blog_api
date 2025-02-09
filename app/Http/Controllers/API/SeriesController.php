@@ -62,9 +62,9 @@ class SeriesController extends Controller
         ], 200);
     }
 
-    public function edit(string $seriesId)
+    public function edit($id)
     {
-        $series = $this->seriesService->getSeriesById($seriesId);
+        $series = $this->seriesService->getSeriesById($id);
 
         return response()->json([
             'status' => 200,
@@ -73,9 +73,9 @@ class SeriesController extends Controller
         ], 200);
     }
 
-    public function update(string $seriesId, UpdateSeriesRequest $request)
+    public function update($id, UpdateSeriesRequest $request)
     {
-        $series = $this->seriesService->updateSeries($seriesId, $request->validated());
+        $series = $this->seriesService->updateSeries($id, $request->validated());
 
         return response()->json([
             'status' => 200,
@@ -84,14 +84,21 @@ class SeriesController extends Controller
         ], 200);
     }
 
-    public function destroy(string $seriesId)
+    public function destroy($id)
     {
-        $series = $this->seriesService->deleteSeries($seriesId);
+        $series = $this->seriesService->deleteSeries($id);
 
-        return response()->json([
-            'status' => 200,
-            'message' => 'Series Deleted Successfully',
-            'series' => $series,
-        ], 200);
+        if ($series) {
+            return response()->json([
+                'status' => 200,
+                'message' => 'Series Deleted Successfully',
+                'series' => $series,
+            ], 200);
+        } else {
+            return response()->json([
+                'status' => 500,
+                'message' => 'Failed to delete series, Please try again',
+            ], 404);
+        }
     }
 }

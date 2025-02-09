@@ -11,8 +11,12 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('posts', function (Blueprint $table) {
-            $table->string('slug')->after('title');
+        Schema::create('headers', function (Blueprint $table) {
+            $table->id();
+            $table->foreignId('content_block_id')->constrained('content_blocks')->onDelete('cascade');
+            $table->tinyInteger('level');
+            $table->longText('header');
+            $table->timestamps();
         });
     }
 
@@ -21,10 +25,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('posts', function (Blueprint $table) {
-            if (Schema::hasColumn('posts', 'slug')) {
-                $table->dropColumn('slug');
-            }
-        });
+        Schema::dropIfExists('headers');
     }
 };

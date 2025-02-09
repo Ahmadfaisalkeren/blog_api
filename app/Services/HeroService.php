@@ -12,7 +12,7 @@ class HeroService
 {
     public function getHeroes()
     {
-        $heroes = Hero::all();
+        $heroes = Hero::orderBy('created_at', 'desc')->get();
 
         return $heroes;
     }

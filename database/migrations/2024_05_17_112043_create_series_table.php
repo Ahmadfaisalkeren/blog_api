@@ -12,13 +12,12 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('series', function (Blueprint $table) {
-            $table->uuid('id')->primary();
+            $table->id();
             $table->string('title');
             $table->string('slug');
             $table->string('author');
             $table->date('series_date');
             $table->enum('status', ['publish', 'hide'])->default('hide');
-            $table->string('image');
             $table->timestamps();
         });
     }

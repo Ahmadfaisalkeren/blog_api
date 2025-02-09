@@ -1,10 +1,10 @@
 <?php
 
-namespace App\Http\Requests\Series;
+namespace App\Http\Requests\Image;
 
 use Illuminate\Foundation\Http\FormRequest;
 
-class StoreSeriesRequest extends FormRequest
+class StoreTemporaryImageRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -22,11 +22,7 @@ class StoreSeriesRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'title' => 'required|string|max:255',
-            'slug' => 'required|string|max:255',
-            'author' => 'required|string|max:255',
-            'series_date' => 'required|date',
-            'status' => 'required|in:publish,hide',
+            'image_url' => 'required|mimes:png,jpg,jpeg,svg|max:2048',
         ];
     }
 }

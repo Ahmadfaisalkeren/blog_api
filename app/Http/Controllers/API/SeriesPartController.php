@@ -7,6 +7,7 @@ use App\Services\SeriesPartService;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\SeriesPart\StoreSeriesPartRequest;
 use App\Http\Requests\SeriesPart\UpdateSeriesPartRequest;
+use Illuminate\Support\Facades\Log;
 
 class SeriesPartController extends Controller
 {
@@ -28,31 +29,35 @@ class SeriesPartController extends Controller
         ], 200);
     }
 
-    // public function publishedSeries()
-    // {
-    //     $seriesPart = $this->seriesPartService->publishedSeriesPart();
-
-    //     return response()->json([
-    //         'status' => 200,
-    //         'message' => "Series Data Fetched Successfully",
-    //         'seriesPart' => $seriesPart
-    //     ], 200);
-    // }
-
-    public function store(StoreSeriesPartRequest $request)
+    public function store(StoreSeriesPartRequest $request, $id = null)
     {
-        $seriesPart = $this->seriesPartService->storeSeriespart($request->validated());
+        try {
+            $seriesPartData = $request->all();
+            $seriesPartData['id'] = $id;
 
-        return response()->json([
-            'status' => 200,
-            'message' => 'Series Part Stored Successfully',
-            'seriesPart' => $seriesPart,
-        ], 200);
+            $seriesPart = $this->seriesPartService->storeSeriespart($seriesPartData);
+
+            $message = $id ? 'Series Part Updated Successfully' : 'Series Part Created Successfully';
+
+            return response()->json([
+                'status' => 200,
+                'message' => $message,
+                'seriesPart' => $seriesPart,
+            ]);
+        } catch (\Exception $e) {
+            Log::error($e->getMessage());
+
+            return response()->json([
+                'status' => 500,
+                'message' => 'Failed to process series part',
+                'error' => $e->getMessage(),
+            ], 500);
+        }
     }
 
-    public function edit(string $seriesPartId)
+    public function edit($id)
     {
-        $seriesPart = $this->seriesPartService->getSeriesPartById($seriesPartId);
+        $seriesPart = $this->seriesPartService->getSeriesPartById($id);
 
         return response()->json([
             'status' => 200,
@@ -61,25 +66,24 @@ class SeriesPartController extends Controller
         ], 200);
     }
 
-    public function update(string $seriesPartId, UpdateSeriesPartRequest $request)
+    public function show($seriesPartId)
     {
-        $seriesPart = $this->seriesPartService->updateSeriesPart($seriesPartId, $request->validated());
+        $seriesPart = $this->seriesPartService->getSeriesPartBySeriesPartId($seriesPartId);
 
         return response()->json([
             'status' => 200,
-            'message' => 'Series Part Updated Successfully',
+            'message' => 'Series Part Fetched Successfully',
             'seriesPart' => $seriesPart,
         ], 200);
     }
 
-    public function destroy(string $seriesPartId)
+    public function destroy($id)
     {
-        $seriesPart = $this->seriesPartService->deleteSeriesPart($seriesPartId);
+        $this->seriesPartService->deleteSeriesPart($id);
 
         return response()->json([
             'status' => 200,
             'message' => 'Series Part Deleted Successfully',
-            'seriesPart' => $seriesPart,
         ], 200);
     }
 }
