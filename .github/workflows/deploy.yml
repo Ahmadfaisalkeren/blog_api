@@ -1,4 +1,4 @@
-name: Deploy Laravel to VPS
+name: Deploy Laravel to Docker Server
 
 on:
   push:
@@ -10,17 +10,36 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout Repository
-        uses: actions/checkout@v4
-
-      - name: Deploy to VPS
-        uses: appleboy/ssh-action@v0.1.7
+      - name: Deploy via SSH
+        uses: appleboy/ssh-action@v0.1.10
         with:
-          host: ${{ secrets.VPS_HOST }}
-          username: ${{ secrets.VPS_USERNAME }}
-          key: ${{ secrets.VPS_SSH_KEY }}
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USER }}
+          key: ${{ secrets.SSH_KEY }}
           script: |
             cd /var/www/docker/backend_blog
+
+            echo "🚀 Pulling latest changes from GitHub..."
             git pull origin main
-            docker compose down
-            docker compose up -d --build
+
+            echo "🔍 Checking if this is a first-time setup..."
+            if [ ! -f "storage/oauth-private.key" ]; then
+              echo "✅ First-time setup detected! Running full Laravel setup..."
+              docker compose build laravel_franken
+              docker compose up -d --no-deps laravel_franken
+              docker compose exec laravel_franken php artisan key:generate
+              docker compose exec laravel_franken php artisan migrate --force
+              docker compose exec laravel_franken php artisan storage:link
+              docker compose exec laravel_franken php artisan cache:clear
+              docker compose exec laravel_franken php artisan config:clear
+              docker compose exec laravel_franken php artisan view:clear
+            else
+              echo "🔄 Regular update detected! Just refreshing the app..."
+              docker compose build laravel_franken
+              docker compose up -d --no-deps laravel_franken
+              docker compose exec laravel_franken php artisan cache:clear
+              docker compose exec laravel_franken php artisan config:clear
+              docker compose exec laravel_franken php artisan view:clear
+            fi
+
+            echo "🎉 Deployment complete!"
