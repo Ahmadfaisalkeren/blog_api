@@ -93,7 +93,7 @@
                                             <h2 class="text-xl font-semibold text-black dark:text-white">Documentation</h2>
 
                                             <p class="mt-4 text-sm/relaxed">
-                                                Jika tulisan ini muncul, maka implementasi CI/CD menggunakan Github Actions Berhasil dilakukan, tapi boong, ternyata belum berhasil wkwkwk
+                                                Jika tulisan ini muncul, maka implementasi CI/CD menggunakan Github Actions Berhasil dilakukan, tapi boong, ternyata belum berhasil wkwkwk, masih mencoba update ketiga
                                             </p>
                                         </div>
                                     </div>
