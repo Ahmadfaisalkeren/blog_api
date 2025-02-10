@@ -93,7 +93,7 @@
                                             <h2 class="text-xl font-semibold text-black dark:text-white">Documentation</h2>
 
                                             <p class="mt-4 text-sm/relaxed">
-                                                Ini adalah update kelima setup CI/CD menggunakan Github Actions
+                                                Jika tulisan ini muncul setelah anda merefresh halaman Laravel, update CI/CD anda berhasil cuy
                                             </p>
                                         </div>
                                     </div>
