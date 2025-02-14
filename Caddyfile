@@ -1,5 +1,5 @@
 apigeni.kipasangen.my.id {
-    reverse_proxy kemal:80
+    reverse_proxy blog_api:80
 
     tls {
         protocols tls1.2 tls1.3

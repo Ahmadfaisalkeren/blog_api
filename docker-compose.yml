@@ -2,7 +2,7 @@
 services:
   blog_api:
     container_name: blog_api
-    image: image_kemal
+    image: image_blog_api
     build: .
     ports:
       - "8005:80"

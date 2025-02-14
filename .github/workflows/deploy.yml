@@ -46,7 +46,7 @@ jobs:
             if [ ! -f .env ]; then
               cp .env.example .env
               sed -i "s|APP_KEY=.*|APP_KEY=${{ secrets.APP_KEY }}|" .env
-              sed -i "s|DB_HOST=.*|DB_HOST=kemal_db|" .env
+              sed -i "s|DB_HOST=.*|DB_HOST=blog_api_db|" .env
               sed -i "s|DB_PASSWORD=.*|DB_PASSWORD=${{ secrets.DB_PASSWORD }}|" .env
               sed -i '/^DB_PASSWORD=/p; s/^DB_PASSWORD=/DB_ROOT_PASSWORD=/' .env
             fi
@@ -71,7 +71,7 @@ jobs:
             cd /var/www/docker/blog_api
             counter=0
             max_retries=30
-            until docker compose exec -T kemal_db mysqladmin ping -h localhost -u root -p${{ secrets.DB_PASSWORD }} --silent; do
+            until docker compose exec -T blog_api_db mysqladmin ping -h localhost -u root -p${{ secrets.DB_PASSWORD }} --silent; do
               counter=$((counter + 1))
               [ $counter -eq $max_retries ] && exit 1
               echo "Waiting for database... Attempt $counter/$max_retries"
