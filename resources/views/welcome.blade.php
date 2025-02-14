@@ -93,7 +93,7 @@
                                             <h2 class="text-xl font-semibold text-black dark:text-white">Documentation</h2>
 
                                             <p class="mt-4 text-sm/relaxed">
-                                                Jika tulisan ini muncul setelah anda merefresh halaman Laravel, update CI/CD anda berhasil cuy
+                                                Testing CI/CD pipelines for your Web Blog Laravel application.
                                             </p>
                                         </div>
                                     </div>
