@@ -7,45 +7,20 @@ services:
       - "8005:80"
     env_file:
       - .env
-    depends_on:
-      - blog_api_db
     networks:
       - blog_api_network
-
-  blog_api_db:
-    image: mysql:5.7
-    container_name: blog_api_db
-    restart: always
-    env_file:
-      - .env
-    environment:
-      MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD}
-      MYSQL_DATABASE: ${DB_DATABASE}
-    ports:
-      - "3307:3306"
-    volumes:
-      - mysql_data:/var/lib/mysql
-    networks:
-      - blog_api_network
-    healthcheck:
-      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
 
   phpmyadmin:
     image: phpmyadmin/phpmyadmin
     container_name: phpmyadmin
     restart: always
     environment:
-      PMA_HOST: blog_api_db
+      PMA_HOST: host.docker.internal
       MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD}
     ports:
       - "8080:80"
     networks:
       - blog_api_network
-    depends_on:
-      - blog_api_db
 
   caddy:
     image: caddy:latest
@@ -68,6 +43,5 @@ networks:
     driver: bridge
 
 volumes:
-  mysql_data:
   caddy_data:
   caddy_config:
