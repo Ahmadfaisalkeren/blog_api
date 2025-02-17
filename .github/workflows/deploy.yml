@@ -61,6 +61,24 @@ jobs:
             cd /var/www/docker/blog_api
             docker compose up -d --build
 
+            - name: Verify Services
+            uses: appleboy/ssh-action@v0.1.10
+            with:
+              host: ${{ secrets.VPS_HOST }}
+              username: ${{ secrets.VPS_USERNAME }}
+              key: ${{ secrets.VPS_SSH_KEY }}
+              script: |
+                cd /var/www/docker/blog_api
+                echo "Checking container statuses..."
+                docker ps | grep mysql_server
+                docker ps | grep blog_api
+
+                echo "Verifying network connectivity..."
+                docker exec blog_api ping -c 2 mysql_server
+
+                echo "Testing MySQL connection..."
+                docker exec mysql_server mysqladmin ping -h localhost -u root -p${{ secrets.DB_PASSWORD }}
+
       - name: Create Database if Not Exists
         uses: appleboy/ssh-action@v0.1.10
         with:
@@ -79,8 +97,8 @@ jobs:
           script: |
             cd /var/www/docker/blog_api
             counter=0
-            max_retries=30
-            until docker compose exec -T mysql_server mysqladmin ping -h localhost -u root -p${{ secrets.DB_PASSWORD }} --silent; do
+            max_retries=15
+            until docker exec mysql_server mysql -u root -p${{ secrets.DB_PASSWORD }} -e "SELECT 1;" 2>/dev/null; do
               counter=$((counter + 1))
               [ $counter -eq $max_retries ] && exit 1
               echo "Waiting for database... Attempt $counter/$max_retries"
