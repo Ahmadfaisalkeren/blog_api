@@ -2,6 +2,6 @@ apigeni.kipasangen.my.id {
     reverse_proxy blog_api:80
 
     tls {
-        protocols tls1.2 tls1.3
+       ca https://acme-staging-v02.api.letsencrypt.org/directory
     }
 }
