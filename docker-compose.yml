@@ -10,16 +10,6 @@ services:
     networks:
       - my_network
 
-  mysql_server:
-    image: mysql:5.7
-    container_name: mysql_server
-    environment:
-      MYSQL_ROOT_PASSWORD: ${DB_PASSWORD}
-    ports:
-      - "3306:3306"
-    networks:
-      - my_network
-
   caddy:
     image: caddy:latest
     container_name: blog_api_reverse_proxy
@@ -32,15 +22,13 @@ services:
       - caddy_data:/data
       - caddy_config:/config
     networks:
-      - blog_api_network
+      - my_network
     depends_on:
       - blog_api
 
 networks:
   my_network:
-    driver: bridge
-  blog_api_network:
-    driver: bridge
+    external: true
 
 volumes:
   caddy_data:
