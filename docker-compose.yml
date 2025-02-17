@@ -8,7 +8,7 @@ services:
     env_file:
       - .env
     networks:
-      - blog_api_network
+      - my_network
 
   caddy:
     image: caddy:latest
