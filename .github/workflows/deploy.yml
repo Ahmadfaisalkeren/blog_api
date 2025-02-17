@@ -68,7 +68,7 @@ jobs:
           username: ${{ secrets.VPS_USERNAME }}
           key: ${{ secrets.VPS_SSH_KEY }}
           script: |
-            docker compose exec -T mysql_server mysql -u root -p${{ secrets.DB_PASSWORD }} -e "CREATE DATABASE IF NOT EXISTS blog_api;"
+            docker exec -i mysql_server mysql -u root -p${{ secrets.DB_PASSWORD }} -e "CREATE DATABASE IF NOT EXISTS blog_api;"
 
       - name: Wait for Database
         uses: appleboy/ssh-action@v0.1.10
