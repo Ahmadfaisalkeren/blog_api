@@ -51,6 +51,18 @@ jobs:
               sed -i '/^DB_PASSWORD=/p; s/^DB_PASSWORD=/DB_ROOT_PASSWORD=/' .env
             fi
 
+      - name: Deploy Nginx Configuration
+        uses: appleboy/ssh-action@v0.1.10
+        with:
+          host: ${{ secrets.VPS_HOST }}
+          username: ${{ secrets.VPS_USERNAME }}
+          key: ${{ secrets.VPS_SSH_KEY }}
+          script: |
+            echo "Deploying Nginx Configuration..."
+            cp /var/www/docker/blog_api/.nginx/blog_api.conf /etc/nginx/conf.d/blog_api.conf
+            docker exec nginx-container nginx -s reload
+            echo "Nginx configuration updated & reloaded."
+
       - name: Build Docker Services
         uses: appleboy/ssh-action@v0.1.10
         with:
