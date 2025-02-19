@@ -1,7 +1,0 @@
-apigeni.kipasangen.my.id {
-    reverse_proxy blog_api:80
-
-    tls {
-       ca https://acme-staging-v02.api.letsencrypt.org/directory
-    }
-}
