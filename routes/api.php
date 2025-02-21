@@ -50,3 +50,7 @@ Route::get('series/{slug}/show', [SeriesController::class, 'show']);
 Route::get('publishedSeries', [SeriesController::class, 'publishedSeries']);
 Route::get('seriesParts', [SeriesPartController::class, 'index']);
 Route::get('seriesPart/{seriesSlug}', [SeriesPartController::class, 'index']);
+
+Route::get('phpinfo', function () {
+    phpinfo();
+});
